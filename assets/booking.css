@@ -1,0 +1,54 @@
+.yclients-booking-form {
+  max-width: 520px;
+  padding: 16px;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.yclients-booking-form .yclients-field {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yclients-booking-form input,
+.yclients-booking-form select,
+.yclients-booking-form textarea {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.yclients-booking-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.yclients-booking-form .yclients-submit {
+  background: #1e7dd7;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.yclients-booking-form .yclients-submit:hover {
+  background: #155fa3;
+}
+
+.yclients-message {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.yclients-message-success {
+  color: #0a7a31;
+}
+
+.yclients-message-error {
+  color: #b32d2e;
+}
