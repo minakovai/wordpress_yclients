@@ -27,6 +27,54 @@
   resize: vertical;
 }
 
+.yclients-quick-slots {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px dashed #d2d2d2;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.yclients-quick-slots h3,
+.yclients-quick-slots h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.yclients-slots-group {
+  margin-bottom: 10px;
+}
+
+.yclients-slots-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.yclients-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.yclients-slot-button {
+  background: #1e7dd7;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.yclients-slot-button:hover {
+  background: #155fa3;
+}
+
 .yclients-booking-form .yclients-submit {
   background: #1e7dd7;
   color: #fff;

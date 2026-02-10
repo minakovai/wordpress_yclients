@@ -82,6 +82,10 @@ final class Shortcodes {
 					<label for="yclients-time"><?php echo esc_html__( 'Time', 'yclients-booking-wp' ); ?></label>
 					<select id="yclients-time" name="time" required></select>
 				</div>
+				<div class="yclients-quick-slots" aria-live="polite">
+					<h3><?php echo esc_html__( 'Available slots for ближайшие дни', 'yclients-booking-wp' ); ?></h3>
+					<div class="yclients-slots-list" data-yclients-slots></div>
+				</div>
 				<div class="yclients-field">
 					<label for="yclients-comment"><?php echo esc_html__( 'Comment (optional)', 'yclients-booking-wp' ); ?></label>
 					<textarea id="yclients-comment" name="comment"></textarea>

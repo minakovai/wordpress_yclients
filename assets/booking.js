@@ -11,6 +11,7 @@
 
   const form = formWrap.querySelector('form');
   const messageEl = formWrap.querySelector('.yclients-message');
+  const slotsContainer = formWrap.querySelector('[data-yclients-slots]');
 
   const serviceSelect = form.querySelector('#yclients-service');
   const staffSelect = form.querySelector('#yclients-staff');
@@ -103,18 +104,18 @@
     setOptions(staffSelect, staff, strings.select_staff || 'Select');
     setOptions(dateSelect, [], strings.select_date || 'Select');
     setOptions(timeSelect, [], strings.select_time || 'Select');
+    renderQuickSlots([]);
     setMessage('');
   };
 
   const loadDates = async (serviceId, staffId) => {
     setMessage(strings.loading || 'Loading');
     const payload = await fetchJson('/available-dates', { service_id: serviceId, staff_id: staffId });
-    const dates = normalizeList(payload).map((item) => ({
-      id: item.date || item,
-      title: item.date || item,
-    }));
-    setOptions(dateSelect, dates, strings.select_date || 'Select');
+    const dates = normalizeList(payload).map((item) => item.date || item).filter(Boolean);
+    const dateOptions = dates.map((date) => ({ id: date, title: date }));
+    setOptions(dateSelect, dateOptions, strings.select_date || 'Select');
     setOptions(timeSelect, [], strings.select_time || 'Select');
+    renderQuickSlots(dates.slice(0, 2));
     setMessage('');
   };
 
@@ -127,6 +128,81 @@
     }));
     setOptions(timeSelect, times, strings.select_time || 'Select');
     setMessage('');
+  };
+
+  const renderQuickSlots = async (dates) => {
+    if (!slotsContainer) {
+      return;
+    }
+    slotsContainer.innerHTML = '';
+    if (!dates.length || !serviceSelect.value || !staffSelect.value) {
+      return;
+    }
+
+    for (const date of dates) {
+      try {
+        const payload = await fetchJson('/available-times', {
+          service_id: serviceSelect.value,
+          staff_id: staffSelect.value,
+          date,
+        });
+        const times = normalizeList(payload).map((item) => item.time || item).filter(Boolean);
+        if (!times.length) {
+          continue;
+        }
+        const dateGroup = document.createElement('div');
+        dateGroup.className = 'yclients-slots-group';
+        const heading = document.createElement('h4');
+        heading.textContent = date;
+        dateGroup.appendChild(heading);
+        const list = document.createElement('div');
+        list.className = 'yclients-slots-times';
+        times.forEach((time) => {
+          const slot = document.createElement('div');
+          slot.className = 'yclients-slot';
+          const label = document.createElement('span');
+          label.textContent = time;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'yclients-slot-button';
+          button.textContent = strings.submit || 'Book now';
+          button.addEventListener('click', () => {
+            dateSelect.value = date;
+            timeSelect.value = time;
+            if (!form.reportValidity()) {
+              setMessage(strings.error || 'Error', 'error');
+              return;
+            }
+            handleSubmit();
+          });
+          slot.appendChild(label);
+          slot.appendChild(button);
+          list.appendChild(slot);
+        });
+        dateGroup.appendChild(list);
+        slotsContainer.appendChild(dateGroup);
+      } catch (error) {
+        setMessage(error.message, 'error');
+      }
+    }
+  };
+
+  const handleSubmit = async () => {
+    setMessage(strings.loading || 'Loading');
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+    payload.consent = formData.get('consent') === 'on';
+
+    try {
+      const response = await postJson('/book', payload);
+      const bookingId = response.id || response.record_id || response.data?.id || '';
+      const summary = bookingId ? `${strings.success || 'Success'} #${bookingId}` : strings.success || 'Success';
+      setMessage(summary, 'success');
+      form.reset();
+      renderQuickSlots([]);
+    } catch (error) {
+      setMessage(error.message, 'error');
+    }
   };
 
   serviceSelect.addEventListener('change', async (event) => {
@@ -164,21 +240,7 @@
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    setMessage(strings.loading || 'Loading');
-
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-    payload.consent = formData.get('consent') === 'on';
-
-    try {
-      const response = await postJson('/book', payload);
-      const bookingId = response.id || response.record_id || response.data?.id || '';
-      const summary = bookingId ? `${strings.success || 'Success'} #${bookingId}` : strings.success || 'Success';
-      setMessage(summary, 'success');
-      form.reset();
-    } catch (error) {
-      setMessage(error.message, 'error');
-    }
+    await handleSubmit();
   });
 
   loadServices().catch((error) => {
